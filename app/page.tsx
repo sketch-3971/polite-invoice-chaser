@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, ShieldCheck, Mail, Sparkles, X } from 'lucide-react'
 
@@ -10,6 +11,7 @@ const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600'
 
 export default function LandingPage() {
+  const router = useRouter()
   const [showModal, setShowModal] = useState(false)
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -28,18 +30,18 @@ export default function LandingPage() {
             Polite Invoice Chaser
           </Link>
           <div className="flex items-center gap-1.5">
-            <Link
-              href="/login"
+            <button
+              onClick={() => router.push('/login')}
               className={`rounded-full px-3.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-900/5 hover:text-slate-900 ${ease} ${focusRing}`}
             >
               Sign in
-            </Link>
-            <Link
-              href="/login"
+            </button>
+            <button
+              onClick={() => router.push('/login')}
               className={`rounded-full bg-slate-900 px-3.5 py-1.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] hover:bg-slate-700 ${ease} ${focusRing}`}
             >
               Get Started
-            </Link>
+            </button>
           </div>
         </nav>
       </header>
@@ -63,13 +65,13 @@ export default function LandingPage() {
                 review it, click approve, and send it straight from your own Gmail account.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/login"
+                <button
+                  onClick={() => router.push('/login')}
                   className={`group inline-flex items-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_10px_24px_-8px_rgba(13,148,136,0.6)] hover:-translate-y-0.5 hover:bg-teal-500 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_14px_30px_-8px_rgba(13,148,136,0.65)] active:translate-y-0 ${ease} ${focusRing}`}
                 >
                   Start chasing for free
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" />
-                </Link>
+                </button>
                 <a
                   href="#pricing"
                   className={`inline-flex items-center rounded-full border border-slate-900/10 bg-white/60 px-6 py-3 text-sm font-semibold text-slate-800 backdrop-blur-md hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md active:translate-y-0 ${ease} ${focusRing}`}
@@ -117,19 +119,19 @@ export default function LandingPage() {
                   </div>
 
                   <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-slate-50 pt-4">
-                    <Link
-                      href="/login"
+                    <button
+                      onClick={() => router.push('/login')}
                       className={`rounded-full px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 transition-colors`}
                     >
                       Edit text
-                    </Link>
-                    <Link 
-                      href="/login" 
+                    </button>
+                    <button 
+                      onClick={() => router.push('/login')}
                       className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] hover:bg-teal-500 transition-colors"
                     >
                       <Mail className="h-4 w-4" />
                       Approve &amp; open in Gmail
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -233,12 +235,12 @@ export default function LandingPage() {
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> Manual entry only
                   </li>
                 </ul>
-                <Link
-                  href="/login"
+                <button
+                  onClick={() => router.push('/login')}
                   className={`mt-8 block w-full rounded-full border border-teal-600/70 bg-white px-3 py-2.5 text-center text-sm font-semibold text-teal-700 hover:bg-teal-50 ${ease} ${focusRing}`}
                 >
                   Get Started
-                </Link>
+                </button>
               </div>
 
               {/* Pro Tier */}
@@ -284,9 +286,12 @@ export default function LandingPage() {
             <Link href="/terms" className={`hover:text-slate-900 ${ease} ${focusRing} rounded`}>
               Terms of Service
             </Link>
-            <Link href="/login" className={`hover:text-slate-900 font-medium ${ease} ${focusRing} rounded`}>
+            <button 
+              onClick={() => router.push('/login')} 
+              className={`hover:text-slate-900 font-medium text-left ${ease} ${focusRing} rounded`}
+            >
               Sign in
-            </Link>
+            </button>
           </div>
         </div>
       </footer>
