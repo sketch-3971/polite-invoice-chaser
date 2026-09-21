@@ -4,7 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { invoiceId } = body;
+    // 1. Extract the selected tone from the request body alongside the invoiceId
+    const { invoiceId, tone } = body;
 
     if (!invoiceId) {
       return NextResponse.json({ error: "Missing invoice ID" }, { status: 400 });
@@ -34,14 +35,21 @@ export async function POST(request: Request) {
     const dueDate = new Date(invoice.due_date);
     const daysLate = Math.ceil((new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    let tone = "friendly and gentle reminder";
-    if (daysLate > 7) tone = "firm but professional reminder";
-    if (daysLate > 14) tone = "strict and urgent final notice";
+    // 2. Map the user's selected tone to highly specific LLM instructions
+    let toneInstruction = "professional and polite";
+    if (tone === "gentle") {
+      toneInstruction = "friendly, gentle, and accommodating (assuming they just forgot or missed the email)";
+    } else if (tone === "standard") {
+      toneInstruction = "clear, professional, and standard polite";
+    } else if (tone === "firm") {
+      toneInstruction = "strict, firm, and urgent (treating this as a final notice)";
+    }
 
+    // 3. Inject the toneInstruction into the prompt
     const prompt = `You are a professional assistant managing billing. 
     Draft a short, polite email to a client named ${invoice.client_name}. 
     They owe $${invoice.amount}. This invoice is ${daysLate > 0 ? daysLate + ' days overdue' : 'due soon'}.
-    The tone MUST be a ${tone}. 
+    The tone MUST be ${toneInstruction}. 
     
     Sign off the email professionally. Mention they can reply directly to ${senderEmail} with questions. 
     Leave a placeholder "[Your Name]" at the bottom.

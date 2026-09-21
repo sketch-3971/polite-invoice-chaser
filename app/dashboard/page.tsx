@@ -189,7 +189,12 @@ export default async function DashboardPage() {
                     <th scope="col" className="px-6 py-3.5 text-right">Amount</th>
                     <th scope="col" className="px-6 py-3.5">Due Date</th>
                     <th scope="col" className="px-6 py-3.5">Status</th>
-                    <th scope="col" className="px-6 py-3.5 text-right">Actions</th>
+                    <th scope="col" className="px-6 py-3.5 text-right">
+                      Actions 
+                      <span className="ml-2 font-normal text-slate-400 text-[10px]">
+                        (🔒 Review before sending)
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -239,30 +244,25 @@ export default async function DashboardPage() {
                               Payment Received 🎉
                             </span>
                           ) : (
-                            <div className="flex flex-col items-end gap-1.5">
-                              <div className="flex items-center justify-end gap-2">
-                                <form action={async () => {
-                                  'use server'
-                                  await markInvoicePaid(inv.id)
-                                }}>
-                                  <button 
-                                    type="submit"
-                                    className="rounded-lg border border-teal-500/30 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-teal-600"
-                                  >
-                                    Mark Paid
-                                  </button>
-                                </form>
+                            <div className="flex items-center justify-end gap-3">
+                              <form action={async () => {
+                                'use server'
+                                await markInvoicePaid(inv.id)
+                              }}>
+                                <button 
+                                  type="submit"
+                                  className="text-xs font-medium text-slate-400 transition-all hover:text-slate-900 hover:underline underline-offset-4"
+                                >
+                                  Mark Paid
+                                </button>
+                              </form>
 
-                                <DraftChaseButton
-                                  invoiceId={inv.id}
-                                  clientName={inv.client_name}
-                                  clientEmail={inv.client_email}
-                                  urgent={isOverdue}
-                                />
-                              </div>
-                              <span className="text-[10px] text-slate-500">
-                                🔒 You review before sending
-                              </span>
+                              <DraftChaseButton
+                                invoiceId={inv.id}
+                                clientName={inv.client_name}
+                                clientEmail={inv.client_email}
+                                urgent={isOverdue}
+                              />
                             </div>
                           )}
                         </td>

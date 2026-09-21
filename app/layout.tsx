@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
+// 1. Import Vercel Analytics
+import { Analytics } from "@vercel/analytics/next";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Polite Invoice Chaser",
-  description: "Send courteous invoice reminders without the awkward follow-up.",
+  description: "Chase unpaid invoices without the awkwardness.",
 };
 
 export default function RootLayout({
@@ -16,8 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className="min-h-screen antialiased">{children}</body>
+    <html lang="en">
+      <body className={inter.className}>
+        {children}
+        {/* 2. Drop the component right before the closing body tag */}
+        <Analytics />
+      </body>
     </html>
   );
 }
