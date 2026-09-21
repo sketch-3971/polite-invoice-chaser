@@ -7,8 +7,17 @@ import { Analytics } from "@vercel/analytics/next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Polite Invoice Chaser",
-  description: "Chase unpaid invoices without the awkwardness.",
+  metadataBase: new URL(
+    process.env.NODE_ENV === "production" 
+      ? "https://polite-invoice-chaser.vercel.app" 
+      : "http://localhost:3000"
+  ),
+  title: "Polite Invoice Chaser | Get paid without the awkward emails",
+  description:
+    "Stop stressing over late payments. Our smart assistant drafts the perfect follow-up email. You review it, click approve, and send it straight from your own Gmail.",
+  openGraph: {
+    // ... your existing openGraph stuff
+  }
 };
 
 export default function RootLayout({
