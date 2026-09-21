@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 // 1. Import Vercel Analytics
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] });
 
