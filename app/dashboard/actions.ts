@@ -61,3 +61,26 @@ export async function markInvoicePaid(invoiceId: string): Promise<{ error?: stri
   revalidatePath('/dashboard')
   return {}
 }
+
+export async function bulkAddInvoices(invoices: any[]) {
+  const supabase = await createClient()
+  
+  // Get the current logged-in user
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not logged in')
+
+  // Add the user_id to every invoice row
+  const invoicesWithUser = invoices.map(inv => ({
+    ...inv,
+    user_id: user.id,
+    status: 'pending' // Default status
+  }))
+
+  const { error } = await supabase
+    .from('invoices')
+    .insert(invoicesWithUser)
+
+  if (error) throw new Error(error.message)
+  
+  revalidatePath('/dashboard')
+}

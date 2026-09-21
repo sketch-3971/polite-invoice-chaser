@@ -3,8 +3,9 @@ import { Manrope } from 'next/font/google'
 import { createClient } from '@/lib/supabase/server'
 import AddInvoiceButton from './add-invoice-button'
 import DraftChaseButton from './draft-chase-button'
-import { addInvoice, markInvoicePaid } from './actions'
+import { markInvoicePaid } from './actions'
 import UpgradeButton from './upgrade-button'
+import { CsvUpload } from './csv-upload'
 
 const manrope = Manrope({ subsets: ['latin'] })
 
@@ -130,6 +131,7 @@ export default async function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <UpgradeButton />
+            <CsvUpload />
             <AddInvoiceButton />
           </div>
         </header>
@@ -172,7 +174,10 @@ export default async function DashboardPage() {
               <p className="max-w-sm text-sm text-slate-600">
                 Add your first invoice and we&rsquo;ll help you follow up when it&rsquo;s late.
               </p>
-              <AddInvoiceButton />
+              <div className="flex items-center gap-3 mt-2">
+                <CsvUpload />
+                <AddInvoiceButton />
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -230,29 +235,34 @@ export default async function DashboardPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           {inv.state === 'Paid' ? (
-                            <span className="text-slate-400 pr-4" aria-label="No action needed">
-                              &mdash;
+                            <span className="text-sm font-medium text-emerald-600 pr-4">
+                              Payment Received 🎉
                             </span>
                           ) : (
-                            <div className="flex items-center justify-end gap-2">
-                              <form action={async () => {
-                                'use server'
-                                await markInvoicePaid(inv.id)
-                              }}>
-                                <button 
-                                  type="submit"
-                                  className="rounded-lg border border-teal-500/30 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-teal-600"
-                                >
-                                  Mark Paid
-                                </button>
-                              </form>
+                            <div className="flex flex-col items-end gap-1.5">
+                              <div className="flex items-center justify-end gap-2">
+                                <form action={async () => {
+                                  'use server'
+                                  await markInvoicePaid(inv.id)
+                                }}>
+                                  <button 
+                                    type="submit"
+                                    className="rounded-lg border border-teal-500/30 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-teal-600"
+                                  >
+                                    Mark Paid
+                                  </button>
+                                </form>
 
-                              <DraftChaseButton
-                                invoiceId={inv.id}
-                                clientName={inv.client_name}
-                                clientEmail={inv.client_email}
-                                urgent={isOverdue}
-                              />
+                                <DraftChaseButton
+                                  invoiceId={inv.id}
+                                  clientName={inv.client_name}
+                                  clientEmail={inv.client_email}
+                                  urgent={isOverdue}
+                                />
+                              </div>
+                              <span className="text-[10px] text-slate-500">
+                                🔒 You review before sending
+                              </span>
                             </div>
                           )}
                         </td>
