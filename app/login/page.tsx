@@ -10,6 +10,7 @@ const fontStack =
   '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
 
 export default function LoginPage() {
+  const [name, setName] = useState('') // New state for the user's name
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -30,6 +31,9 @@ export default function LoginPage() {
           email,
           password,
           options: {
+            data: {
+              full_name: name, // Saves the name to Supabase user_metadata
+            },
             emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         })
@@ -86,6 +90,24 @@ export default function LoginPage() {
         {/* Glass Card */}
         <div className="rounded-[2rem] border border-white/70 bg-white/50 p-8 shadow-[0_24px_60px_-28px_rgba(79,70,229,0.35)] backdrop-blur-2xl sm:p-10">
           <form onSubmit={handleAuth} className="space-y-5">
+            
+            {/* Name field only shows up if they are signing up */}
+            {isSignUp && (
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f]/80">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required={isSignUp}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-2 block w-full rounded-xl border border-white/60 bg-white/50 px-4 py-3 text-[#1d1d1f] shadow-sm backdrop-blur-md transition-all focus-visible:border-indigo-500 focus-visible:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/20"
+                  placeholder="Alex Smith"
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-[#1d1d1f]/80">
                 Email address

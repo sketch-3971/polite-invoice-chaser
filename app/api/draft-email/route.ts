@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    // 1. Extract the selected tone from the request body alongside the invoiceId
     const { invoiceId, tone } = body;
 
     if (!invoiceId) {
@@ -13,15 +12,22 @@ export async function POST(request: Request) {
 
     const supabase = await createClient();
     
-    // Securely fetch the logged-in user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const senderEmail = user.email;
+    const senderEmail = user.email || "";
 
-    // Fetch the invoice
+    // 1. Smartly derive the sender's name
+    let senderName = user.user_metadata?.full_name || user.user_metadata?.name;
+    if (!senderName && senderEmail) {
+      // Fallback: capitalize the part of the email before the @ symbol
+      const emailPrefix = senderEmail.split('@')[0];
+      senderName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+    }
+    senderName = senderName || "Your Name";
+
     const { data: invoice, error } = await supabase
       .from('invoices')
       .select('*')
@@ -35,28 +41,39 @@ export async function POST(request: Request) {
     const dueDate = new Date(invoice.due_date);
     const daysLate = Math.ceil((new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    // 2. Map the user's selected tone to highly specific LLM instructions
+    // Calculate the US Standard 1.5% monthly late fee
+    const lateFeeAmount = (Number(invoice.amount) * 0.015).toFixed(2);
+
     let toneInstruction = "professional and polite";
+    let nicheContext = "Do not mention any late fees.";
+
     if (tone === "gentle") {
-      toneInstruction = "friendly, gentle, and accommodating (assuming they just forgot or missed the email)";
+      toneInstruction = "friendly, gentle, and accommodating (assuming they just forgot).";
+      nicheContext = "Do not mention any late fees.";
     } else if (tone === "standard") {
-      toneInstruction = "clear, professional, and standard polite";
+      toneInstruction = "clear, professional, and standard polite.";
+      if (daysLate > 0) {
+        nicheContext = `Remind them gently that standard US freelance contracts include a 1.5% monthly late fee ($${lateFeeAmount}), but explicitly state that you are waiving it as a courtesy if they pay this week.`;
+      }
     } else if (tone === "firm") {
-      toneInstruction = "strict, firm, and urgent (treating this as a final notice)";
+      toneInstruction = "strict, firm, and urgent (treating this as a final notice).";
+      if (daysLate > 0) {
+        nicheContext = `State clearly that a standard 1.5% monthly late fee ($${lateFeeAmount}) has now been triggered per US freelance contract terms. Ask for the new total of $${(Number(invoice.amount) + Number(lateFeeAmount)).toFixed(2)} immediately to avoid further penalties.`;
+      }
     }
 
-    // 3. Inject the toneInstruction into the prompt
-    const prompt = `You are a professional assistant managing billing. 
+    // 2. Inject the dynamically generated senderName into the prompt
+    const prompt = `You are a professional assistant managing billing for a US-based freelancer. 
     Draft a short, polite email to a client named ${invoice.client_name}. 
-    They owe $${invoice.amount}. This invoice is ${daysLate > 0 ? daysLate + ' days overdue' : 'due soon'}.
-    The tone MUST be ${toneInstruction}. 
+    They originally owed $${invoice.amount}. This invoice is ${daysLate > 0 ? daysLate + ' days overdue' : 'due soon'}.
     
-    Sign off the email professionally. Mention they can reply directly to ${senderEmail} with questions. 
-    Leave a placeholder "[Your Name]" at the bottom.
+    TONE: ${toneInstruction}
+    LATE FEE RULES: ${nicheContext}
+    
+    Sign off the email professionally with the name "${senderName}". Do not use placeholder brackets like [Your Name]. Mention they can reply directly to ${senderEmail} with questions.
 
     Output your response in JSON format with exactly two keys: "subject" and "body".`;
 
-    // Fetch directly from Groq's lightning-fast API
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -64,7 +81,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-20b", // <-- This is the only line that changed
+        model: "openai/gpt-oss-20b",
         response_format: { type: "json_object" },
         messages: [{ role: "user", content: prompt }]
       })
