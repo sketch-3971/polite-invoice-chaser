@@ -196,7 +196,7 @@ export default function LandingPage() {
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> Track unlimited invoices
                   </li>
                   <li className="flex gap-x-3">
-                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> 3 AI email drafts per month
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> 15 AI email drafts per month
                   </li>
                   <li className="flex gap-x-3">
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> Manual entry only
