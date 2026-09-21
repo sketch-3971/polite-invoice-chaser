@@ -1,366 +1,259 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import {
-  ChevronRight,
-  Check,
-  Lock,
-  MailCheck,
-  Send,
-  ShieldCheck,
-  SlidersHorizontal,
-} from "lucide-react";
-import ToneDemo from "./tone-demo";
+import Link from 'next/link'
+import { ArrowRight, CheckCircle2, ShieldCheck, Mail, PenLine } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: "Polite Invoice Chaser: get paid without the awkward emails",
-  description:
-    "Polite Invoice Chaser drafts and sends payment reminders for freelancers and agency owners, gentle at first and firmer as an invoice gets later.",
-};
-
-const fontStack =
-  '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
+// Shared motion + button styles so every interactive element feels the same.
+const ease =
+  'transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none'
 const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500";
-
-const glass = "border border-white/70 bg-white/50 backdrop-blur-2xl";
-
-/* ------------------------------------------------------------------ */
-/* Glass buttons                                                      */
-/* ------------------------------------------------------------------ */
-
-type ButtonVariant = "primary" | "secondary" | "ghost";
-type ButtonSize = "sm" | "lg";
-
-// 1. Standard, buttery smooth Tailwind transitions for scaling and moving
-const buttonBase =
-  "group relative inline-flex select-none items-center justify-center overflow-hidden whitespace-nowrap rounded-full font-medium transition-all duration-500 ease-out hover:-translate-y-1 hover:scale-[1.02] active:scale-95 active:translate-y-0 " +
-  focusRing;
-
-const buttonVariants: Record<ButtonVariant, string> = {
-  primary:
-    "border border-white/40 bg-gradient-to-b from-indigo-500/90 to-indigo-600/90 text-white shadow-[0_8px_24px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_16px_32px_-10px_rgba(79,70,229,0.7)] hover:border-white/70",
-  secondary:
-    "border border-white/80 bg-white/40 text-[#1d1d1f] shadow-sm hover:shadow-md hover:border-white",
-  ghost:
-    "border border-transparent text-[#1d1d1f]/75 hover:text-[#1d1d1f]",
-};
-
-const buttonSizes: Record<ButtonSize, string> = {
-  sm: "h-9 gap-1.5 px-4 text-sm",
-  lg: "h-14 gap-2 px-8 text-[17px]",
-};
-
-function GlassLink({
-  href,
-  variant = "primary",
-  size = "lg",
-  withArrow = false,
-  className = "",
-  children,
-}: {
-  href: string;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  withArrow?: boolean;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`${buttonBase} ${buttonVariants[variant]} ${buttonSizes[size]} ${className}`}
-    >
-      {/* 2. THE FIX: A smooth white overlay layer that fades in on hover */}
-      <span className="absolute inset-0 z-0 bg-white opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-20" />
-      
-      {/* Content sits safely above the overlay */}
-      <span className="relative z-10 flex items-center gap-[inherit]">
-        {children}
-        {withArrow && (
-          <ChevronRight
-            aria-hidden
-            className={`transition-transform duration-500 ease-out group-hover:translate-x-1 ${
-              size === "sm" ? "h-4 w-4" : "h-5 w-5"
-            }`}
-          />
-        )}
-      </span>
-    </Link>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Content                                                            */
-/* ------------------------------------------------------------------ */
-
-const doubts = [
-  { text: "Is “just circling back” too passive?", align: "self-start" },
-  { text: "It’s been three weeks. Is it rude to ask again?", align: "self-end" },
-  { text: "What if they stop hiring me?", align: "self-start" },
-] as const;
-
-const scale = [
-  {
-    label: "A few days late",
-    desc: "A friendly nudge that assumes it slipped their mind.",
-    dot: "bg-teal-400",
-  },
-  {
-    label: "Two weeks late",
-    desc: "A firm follow-up with a clear ask and a clear date.",
-    dot: "bg-indigo-400",
-  },
-  {
-    label: "A month late",
-    desc: "A final notice that stays direct, professional, and polite.",
-    dot: "bg-rose-400",
-  },
-] as const;
-
-const clients = ["Northwind Studio", "Halden & Co", "Pixel Barn"] as const;
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600'
 
 export default function LandingPage() {
-  const year = new Date().getFullYear();
-
   return (
-    <div
-      className="relative isolate min-h-screen overflow-x-clip bg-[#f5f5f7] text-[#1d1d1f] antialiased"
-      style={{ fontFamily: fontStack }}
-    >
-      {/* Pastel background blurs */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[42rem] w-[42rem] rounded-full bg-indigo-300/60 blur-[120px]" />
-        <div className="absolute -right-32 top-1/4 h-[36rem] w-[36rem] rounded-full bg-teal-200/70 blur-[120px]" />
-        <div className="absolute -bottom-40 left-1/4 h-[40rem] w-[40rem] rounded-full bg-rose-200/70 blur-[120px]" />
-      </div>
-
-      {/* Nav */}
-      <header className="sticky top-0 z-50 border-b border-white/60 bg-white/50 backdrop-blur-xl">
-        <nav
-          aria-label="Main"
-          className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6"
-        >
-          <Link href="/" className={`flex items-center gap-2 rounded-md font-semibold ${focusRing}`}>
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#1d1d1f] text-white">
-              <MailCheck aria-hidden className="h-4 w-4" />
-            </span>
+    <div className="min-h-screen bg-[#fbfcfc] text-slate-900 antialiased selection:bg-teal-100">
+      {/* Navigation */}
+      <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl">
+        <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 lg:px-8">
+          <Link href="/" className="text-[15px] font-semibold tracking-tight text-slate-900">
             Polite Invoice Chaser
           </Link>
-
           <div className="flex items-center gap-1.5">
-            <GlassLink href="/login" variant="ghost" size="sm">
+            <Link
+              href="/login"
+              className={`rounded-full px-3.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-900/5 hover:text-slate-900 ${ease} ${focusRing}`}
+            >
               Sign in
-            </GlassLink>
-            <GlassLink href="/login" variant="primary" size="sm">
-              Start free
-            </GlassLink>
+            </Link>
+            <Link
+              href="/login"
+              className={`rounded-full bg-slate-900 px-3.5 py-1.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] hover:bg-slate-700 ${ease} ${focusRing}`}
+            >
+              Get Started
+            </Link>
           </div>
         </nav>
       </header>
 
       <main>
-        {/* Hero */}
-        <section className="mx-auto max-w-6xl px-6 pb-24 pt-20 text-center sm:pt-28">
-          <h1 className="mx-auto max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-[-0.035em] sm:text-6xl lg:text-7xl">
-            Getting paid shouldn’t feel like begging.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-balance text-lg leading-relaxed text-[#6e6e73] sm:text-xl">
-            Polite Invoice Chaser writes and sends every payment reminder for you, gentle at first
-            and firmer as an invoice ages. You keep the client relationship. It does the asking.
-          </p>
-
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <GlassLink href="/login" variant="primary" size="lg" withArrow>
-              Start Chasing for Free
-            </GlassLink>
-            <GlassLink href="#features" variant="secondary" size="lg">
-              See how it works
-            </GlassLink>
+        {/* Hero Section */}
+        <section className="relative overflow-hidden">
+          {/* Soft background light, kept subtle */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute -top-24 right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-teal-200/40 blur-3xl" />
+            <div className="absolute top-40 left-[-10rem] h-[24rem] w-[24rem] rounded-full bg-indigo-200/30 blur-3xl" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-[#fbfcfc]" />
           </div>
 
-          <div className="mt-16 sm:mt-20">
-            <ToneDemo />
-          </div>
-        </section>
-
-        {/* Pain point */}
-        <section aria-labelledby="pain-heading" className="mx-auto max-w-6xl px-6 py-24">
-          <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
-            <div>
-              <h2
-                id="pain-heading"
-                className="text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.03em] sm:text-5xl"
-              >
-                You do great work. Then you have to chase the money.
-              </h2>
-              <div className="mt-6 max-w-xl space-y-5 text-lg leading-relaxed text-[#6e6e73]">
-                <p>
-                  Nobody warns you that half of running a business is politely asking for what
-                  you’re already owed. You write the email, delete it, and write it again. You
-                  wonder if “friendly reminder” sounds weak, or if “second notice” sounds rude. So
-                  you wait another week, and the invoice keeps aging while the stress piles up.
-                </p>
-                <p>
-                  Most clients aren’t dodging you. They’re busy. A well-timed, well-worded nudge is
-                  usually all it takes. You just shouldn’t have to be the one writing it at 11pm.
-                </p>
+          <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8 lg:py-32">
+            {/* Copy */}
+            <div className="max-w-xl">
+              <h1 className="text-balance text-4xl font-semibold tracking-[-0.03em] text-slate-900 sm:text-6xl sm:leading-[1.05]">
+                Chase unpaid invoices without the awkwardness.
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-slate-600">
+                Stop stressing over late payments. Our smart assistant drafts the perfect follow-up email. You
+                review it, click approve, and send it straight from your own Gmail account.
+              </p>
+              <div className="mt-9 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/login"
+                  className={`group inline-flex items-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_10px_24px_-8px_rgba(13,148,136,0.6)] hover:-translate-y-0.5 hover:bg-teal-500 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_14px_30px_-8px_rgba(13,148,136,0.65)] active:translate-y-0 ${ease} ${focusRing}`}
+                >
+                  Start chasing for free
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" />
+                </Link>
+                <a
+                  href="#pricing"
+                  className={`inline-flex items-center rounded-full border border-slate-900/10 bg-white/60 px-6 py-3 text-sm font-semibold text-slate-800 backdrop-blur-md hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md active:translate-y-0 ${ease} ${focusRing}`}
+                >
+                  See pricing
+                </a>
               </div>
+              <p className="mt-4 text-sm text-slate-500">No credit card required • Setup in 60 seconds</p>
             </div>
 
-            <ul className="flex flex-col gap-4">
-              {doubts.map((d) => (
-                <li
-                  key={d.text}
-                  className={`max-w-sm rounded-[1.75rem] px-6 py-4 text-lg shadow-[0_12px_40px_-16px_rgba(244,63,94,0.3)] ${glass} ${d.align}`}
-                >
-                  {d.text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+            {/* Example draft: the one memorable element on the page */}
+            <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+              <div
+                aria-hidden
+                className="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-to-br from-teal-200/50 via-white/0 to-indigo-200/40 blur-2xl"
+              />
+              <div className="rounded-3xl border border-white/70 bg-white/75 p-1.5 shadow-[0_30px_60px_-20px_rgba(15,23,42,0.25)] ring-1 ring-slate-900/5 backdrop-blur-xl">
+                <div className="rounded-[1.25rem] bg-white p-6 ring-1 ring-slate-900/5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                      <PenLine className="h-4 w-4 text-teal-600" />
+                      Example draft
+                    </div>
+                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-600/15">
+                      14 days overdue
+                    </span>
+                  </div>
 
-        {/* Features */}
-        <section
-          id="features"
-          aria-labelledby="features-heading"
-          className="mx-auto max-w-6xl scroll-mt-16 px-6 py-24"
-        >
-          <div className="mx-auto max-w-2xl text-center">
-            <h2
-              id="features-heading"
-              className="text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.03em] sm:text-5xl"
-            >
-              Chasing, handled.
-            </h2>
-            <p className="mt-5 text-balance text-lg leading-relaxed text-[#6e6e73] sm:text-xl">
-              Every overdue invoice gets a message that fits how late it is, written for you and
-              sent when you say so.
-            </p>
-          </div>
+                  <dl className="mt-5 space-y-2 border-b border-slate-100 pb-4 text-sm">
+                    <div className="flex gap-3">
+                      <dt className="w-14 shrink-0 text-slate-400">To</dt>
+                      <dd className="text-slate-700">Maya Chen</dd>
+                    </div>
+                    <div className="flex gap-3">
+                      <dt className="w-14 shrink-0 text-slate-400">Subject</dt>
+                      <dd className="font-medium text-slate-900">Following up on invoice #1042</dd>
+                    </div>
+                  </dl>
 
-          <div className="mt-16 grid gap-5 md:grid-cols-2">
-            {/* Tone scaling */}
-            <article
-              className={`grid items-center gap-10 rounded-[2rem] p-8 shadow-[0_24px_60px_-28px_rgba(79,70,229,0.35)] sm:p-12 md:col-span-2 md:grid-cols-2 ${glass}`}
-            >
-              <div>
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-indigo-600 shadow-sm">
-                  <SlidersHorizontal aria-hidden className="h-6 w-6" />
-                </span>
-                <h3 className="mt-6 text-3xl font-semibold tracking-[-0.02em]">
-                  AI-powered tone scaling
-                </h3>
-                <p className="mt-3 max-w-md text-lg leading-relaxed text-[#6e6e73]">
-                  Our self-trained AI models read how many days an invoice is overdue and writes to match. They start
-                  with a gentle nudge and build to a strict final notice, without ever getting
-                  rude.
-                </p>
-              </div>
+                  <div className="mt-4 space-y-3 text-[15px] leading-relaxed text-slate-700">
+                    <p>Hi Maya,</p>
+                    <p>
+                      I hope your week is going well. Invoice #1042 for $1,200 was due on 3 March, and I
+                      haven&apos;t seen the payment come through yet.
+                    </p>
+                    <p>Could you let me know when I can expect it? Happy to help if anything is holding it up.</p>
+                    <p>Thanks so much,<br />Alex</p>
+                  </div>
 
-              <ol className="relative space-y-7 pl-10 before:absolute before:bottom-2 before:left-[11px] before:top-2 before:w-0.5 before:rounded-full before:bg-gradient-to-b before:from-teal-300 before:via-indigo-300 before:to-rose-300">
-                {scale.map((s) => (
-                  <li key={s.label} className="relative">
+                  <div className="mt-6 flex items-center justify-end gap-2">
                     <span
-                      aria-hidden
-                      className={`absolute -left-10 top-0.5 h-6 w-6 rounded-full border-4 border-white ${s.dot}`}
-                    />
-                    <p className="text-lg font-semibold">{s.label}</p>
-                    <p className="text-[#6e6e73]">{s.desc}</p>
-                  </li>
-                ))}
-              </ol>
-            </article>
-
-            {/* One-click sending */}
-            <article
-              className={`flex flex-col rounded-[2rem] p-8 shadow-[0_24px_60px_-28px_rgba(20,184,166,0.4)] sm:p-10 ${glass}`}
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-teal-600 shadow-sm">
-                <Send aria-hidden className="h-6 w-6" />
-              </span>
-              <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em]">
-                One-click background sending
-              </h3>
-              <p className="mt-3 text-lg leading-relaxed text-[#6e6e73]">
-                Approve the draft and it goes out for you in the background. No copying, no pasting,
-                no opening your inbox.
-              </p>
-              <div className="mt-auto pt-8">
-                <div className="flex items-center gap-3 rounded-2xl border border-white/80 bg-white/70 px-4 py-3 shadow-sm">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-100 text-teal-700">
-                    <Check aria-hidden className="h-4 w-4" />
-                  </span>
-                  <div className="text-sm">
-                    <p className="font-semibold">Reminder sent</p>
-                    <p className="text-[#6e6e73]">Maya Chen, just now</p>
+                      className={`rounded-full px-4 py-2 text-sm font-medium text-slate-600 ring-1 ring-slate-200`}
+                    >
+                      Edit
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
+                      <Mail className="h-4 w-4" />
+                      Approve &amp; open in Gmail
+                    </span>
                   </div>
                 </div>
               </div>
-            </article>
-
-            {/* Secure storage */}
-            <article
-              className={`flex flex-col rounded-[2rem] p-8 shadow-[0_24px_60px_-28px_rgba(244,63,94,0.35)] sm:p-10 ${glass}`}
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-rose-500 shadow-sm">
-                <ShieldCheck aria-hidden className="h-6 w-6" />
-              </span>
-              <h3 className="mt-6 text-2xl font-semibold tracking-[-0.02em]">
-                Secure client storage
-              </h3>
-              <p className="mt-3 text-lg leading-relaxed text-[#6e6e73]">
-                Client details and invoice history are stored securely behind your login, so every
-                follow-up starts with the right name, amount, and date.
-              </p>
-              <ul className="mt-auto space-y-2 pt-8">
-                {clients.map((name) => (
-                  <li
-                    key={name}
-                    className="flex items-center justify-between rounded-2xl border border-white/80 bg-white/70 px-4 py-2.5 text-sm shadow-sm"
-                  >
-                    <span className="font-medium">{name}</span>
-                    <Lock aria-hidden className="h-4 w-4 text-[#6e6e73]" />
-                  </li>
-                ))}
-              </ul>
-            </article>
+            </div>
           </div>
         </section>
 
-        {/* Closing CTA */}
-        <section aria-labelledby="cta-heading" className="mx-auto max-w-4xl px-6 pb-28 pt-12">
-          <div
-            className={`rounded-[2.5rem] p-10 text-center shadow-[0_30px_80px_-30px_rgba(79,70,229,0.4)] sm:p-16 ${glass}`}
-          >
-            <h2
-              id="cta-heading"
-              className="text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.03em] sm:text-5xl"
-            >
-              Send the reminder you’ve been putting off.
+        {/* Trust & How It Works Section */}
+        <section className="border-y border-slate-200/70 bg-slate-50/70 py-24 sm:py-28">
+          <div className="mx-auto max-w-6xl px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-balance text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                You are always in control.
+              </h2>
+              <p className="mt-4 text-lg leading-8 text-slate-600">
+                We designed this to protect your client relationships. No accidental sends, no robotic spam.
+              </p>
+            </div>
+
+            <div className="mx-auto mt-14 grid max-w-2xl grid-cols-1 gap-5 sm:mt-16 lg:max-w-none lg:grid-cols-3">
+              {[
+                {
+                  icon: ShieldCheck,
+                  title: 'We never auto-send',
+                  body: 'The AI only drafts the email. Nothing ever leaves your outbox until you explicitly click the send button.',
+                },
+                {
+                  icon: Mail,
+                  title: 'Sent from your Gmail',
+                  body: "Emails don't come from a weird generic address. They open directly in your own Gmail, coming from you.",
+                },
+                {
+                  icon: CheckCircle2,
+                  title: 'Human-sounding tone',
+                  body: 'Our system uses custom prompts designed specifically for freelancers to sound firm but perfectly polite.',
+                },
+              ].map(({ icon: Icon, title, body }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl border border-white bg-white/80 p-7 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_12px_32px_-16px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/5 backdrop-blur-md"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 ring-1 ring-teal-600/15">
+                    <Icon className="h-5 w-5 text-teal-700" />
+                  </div>
+                  <h3 className="mt-5 text-lg font-semibold tracking-tight text-slate-900">{title}</h3>
+                  <p className="mt-2 text-[15px] leading-7 text-slate-600">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Simple Pricing Section */}
+        <section id="pricing" className="scroll-mt-16 py-24 sm:py-28">
+          <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
+            <h2 className="text-balance text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              Simple, transparent pricing.
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-balance text-lg leading-relaxed text-[#6e6e73]">
-              Add an invoice, review the draft, and send it in one click. The awkward part is on us.
+            <p className="mx-auto mt-4 max-w-xl text-lg leading-8 text-slate-600">
+              Pay for itself the very first time it helps you recover a late invoice.
             </p>
-            <GlassLink href="/login" variant="primary" size="lg" withArrow className="mt-8">
-              Start Chasing for Free
-            </GlassLink>
+
+            <div className="mx-auto mt-14 grid max-w-2xl grid-cols-1 gap-6 text-left sm:grid-cols-2">
+              {/* Free Tier */}
+              <div className="flex flex-col rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_16px_40px_-24px_rgba(15,23,42,0.15)]">
+                <h3 className="text-lg font-semibold text-slate-900">Free Tier</h3>
+                <p className="mt-1.5 text-sm text-slate-500">Perfect for getting started.</p>
+                <div className="mt-6 flex items-baseline gap-1 text-5xl font-semibold tracking-tight text-slate-900">
+                  $0
+                  <span className="text-base font-medium text-slate-500">/mo</span>
+                </div>
+                <ul className="mt-8 flex-1 space-y-3.5 text-sm text-slate-600">
+                  <li className="flex gap-x-3">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> Track unlimited invoices
+                  </li>
+                  <li className="flex gap-x-3">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> 3 AI email drafts per month
+                  </li>
+                  <li className="flex gap-x-3">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" /> Manual entry only
+                  </li>
+                </ul>
+                <Link
+                  href="/login"
+                  className={`mt-8 block w-full rounded-full border border-teal-600/70 bg-white px-3 py-2.5 text-center text-sm font-semibold text-teal-700 hover:bg-teal-50 ${ease} ${focusRing}`}
+                >
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Pro Tier */}
+              <div className="relative flex flex-col overflow-hidden rounded-3xl bg-slate-900 p-8 shadow-[0_30px_60px_-24px_rgba(15,23,42,0.6)] ring-1 ring-teal-500/40">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-teal-500/25 blur-3xl"
+                />
+                <h3 className="relative text-lg font-semibold text-white">Pro Freelancer</h3>
+                <p className="relative mt-1.5 text-sm text-slate-300">For serious professionals.</p>
+                <div className="relative mt-6 flex items-baseline gap-1 text-5xl font-semibold tracking-tight text-white">
+                  $9
+                  <span className="text-base font-medium text-slate-400">/mo</span>
+                </div>
+                <ul className="relative mt-8 flex-1 space-y-3.5 text-sm text-slate-300">
+                  <li className="flex gap-x-3">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-400" /> Unlimited AI email drafts
+                  </li>
+                  <li className="flex gap-x-3">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-400" /> CSV Bulk Import
+                  </li>
+                  <li className="flex gap-x-3">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-400" /> Adjustable email tones
+                  </li>
+                </ul>
+                <Link
+                  href="/login"
+                  className={`relative mt-8 block w-full rounded-full bg-teal-500 px-3 py-2.5 text-center text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_10px_24px_-8px_rgba(20,184,166,0.6)] hover:-translate-y-0.5 hover:bg-teal-400 active:translate-y-0 ${ease} ${focusRing}`}
+                >
+                  Upgrade to Pro
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/60 bg-white/40 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-sm text-[#6e6e73] sm:flex-row">
-          <span className="flex items-center gap-2 font-medium text-[#1d1d1f]">
-            <MailCheck aria-hidden className="h-4 w-4" />
-            Polite Invoice Chaser
-          </span>
-          <p>© {year} Polite Invoice Chaser. All rights reserved.</p>
+      <footer className="border-t border-slate-200 bg-slate-50/70 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-slate-500 sm:flex-row lg:px-8">
+          <p>&copy; {new Date().getFullYear()} Polite Invoice Chaser. All rights reserved.</p>
+          <Link href="/login" className={`hover:text-slate-900 ${ease} ${focusRing} rounded`}>
+            Sign in
+          </Link>
         </div>
       </footer>
     </div>
-  );
+  )
 }
